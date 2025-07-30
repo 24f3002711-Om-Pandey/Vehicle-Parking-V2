@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Admin Search{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6 text-center">Search Results for "{{ q }}"</h1>
+<div class="mb-8">
+    <form method="get" action="{{ url_for('main.admin_search') }}" class="flex justify-center">
+        <input type="text" name="q" placeholder="Search users, lots, reservations..." value="{{ q }}" class="border rounded-l px-4 py-2 focus:outline-none">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-r">Search</button>
+    </form>
+</div>
+{% if users %}
+<h2 class="text-xl font-semibold mb-2">Users</h2>
+<table class="min-w-full bg-white rounded-lg shadow-md mb-6">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">ID</th>
+            <th class="py-2 px-4 border-b">Username</th>
+            <th class="py-2 px-4 border-b">Name</th>
+            <th class="py-2 px-4 border-b">Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td class="py-2 px-4 border-b">{{ user.id }}</td>
+            <td class="py-2 px-4 border-b">{{ user.Username }}</td>
+            <td class="py-2 px-4 border-b">{{ user.Name }}</td>
+            <td class="py-2 px-4 border-b">{{ user.Email }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% if lots %}
+<h2 class="text-xl font-semibold mb-2">Parking Lots</h2>
+<table class="min-w-full bg-white rounded-lg shadow-md mb-6">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">ID</th>
+            <th class="py-2 px-4 border-b">Name</th>
+            <th class="py-2 px-4 border-b">Address</th>
+            <th class="py-2 px-4 border-b">Pin Code</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lot in lots %}
+        <tr>
+            <td class="py-2 px-4 border-b">{{ lot.id }}</td>
+            <td class="py-2 px-4 border-b">{{ lot.Prime_location_name }}</td>
+            <td class="py-2 px-4 border-b">{{ lot.Address }}</td>
+            <td class="py-2 px-4 border-b">{{ lot.Pin_Code }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% if reservations %}
+<h2 class="text-xl font-semibold mb-2">Reservations</h2>
+<table class="min-w-full bg-white rounded-lg shadow-md mb-6">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">ID</th>
+            <th class="py-2 px-4 border-b">User</th>
+            <th class="py-2 px-4 border-b">Spot</th>
+            <th class="py-2 px-4 border-b">Parking Time</th>
+            <th class="py-2 px-4 border-b">Leaving Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in reservations %}
+        <tr>
+            <td class="py-2 px-4 border-b">{{ r.id }}</td>
+            <td class="py-2 px-4 border-b">{{ r.User_id }}</td>
+            <td class="py-2 px-4 border-b">{{ r.Spot_id }}</td>
+            <td class="py-2 px-4 border-b">{{ r.Parking_time.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td class="py-2 px-4 border-b">{{ r.Leaving_time.strftime('%Y-%m-%d %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% if not users and not lots and not reservations %}
+<p class="text-center text-gray-500">No results found.</p>
+{% endif %}
+<a href="{{ url_for('main.admin_dashboard') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">Back to Dashboard</a>
+{% endblock %}

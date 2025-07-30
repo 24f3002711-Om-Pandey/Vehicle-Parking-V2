@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Park-it{% endblock %}</title>
+    <meta name="description" content="A simple web application for managing parking lots and reservations.">
+    <meta name="keywords" content="parking, app, reservation, lot, management, Flask">
+    <meta name="author" content="Your Name/Company">
+    <meta property="og:title" content="Park-it">
+    <meta property="og:description" content="Manage your parking spots and reservations with ease.">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside>
+            <div class="sidebar-title">Park-it</div>
+            <nav>
+                <a href="{{ url_for('main.index') }}">Parking Lots</a>
+                {% if current_user %}
+                    <a href="{{ url_for('main.profile') }}">Profile</a>
+                    {% if not current_user.is_admin %}
+                        <a href="{{ url_for('main.history') }}">Order History</a>
+                    {% endif %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('main.lots') }}">Manage Lots</a>
+                        <a href="{{ url_for('main.admin_dashboard') }}">Admin Dashboard</a>
+                    {% endif %}
+                    <a href="{{ url_for('main.logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('main.login') }}">Login</a>
+                    <a href="{{ url_for('main.register') }}">Register</a>
+                {% endif %}
+            </nav>
+        </aside>
+        <!-- Main Content -->
+        <main>
+            <!-- Flash Messages Display -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div>
+                        {% for category, message in messages %}
+                            <div class="flash-message {% if category == 'error' %}flash-error{% elif category == 'success' %}flash-success{% else %}flash-info{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Content Block: This is where specific page content will be injected -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <!-- Footer Section -->
+    <footer>
+        &copy; 2024 Park-it. All rights reserved.
+    </footer>
+</body>
+</html>

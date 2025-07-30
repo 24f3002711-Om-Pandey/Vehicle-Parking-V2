@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1 style="font-size:2em; font-weight:bold; margin-bottom:28px; text-align:center;">Available Parking Lots</h1>
+<div style="display:flex; flex-wrap:wrap; gap:28px; justify-content:center;">
+    {% for lot in lots %}
+    <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.07); padding:28px 24px 22px 24px; width:320px; display:flex; flex-direction:column; align-items:flex-start;">
+        <h2 style="font-size:1.3em; font-weight:600; margin-bottom:10px;">{{ lot.Prime_location_name }}</h2>
+        <p style="color:#444; margin-bottom:4px;"><span style="font-weight:600;">Address:</span> {{ lot.Address }}</p>
+        <p style="color:#444; margin-bottom:4px;"><span style="font-weight:600;">Pin Code:</span> {{ lot.Pin_Code }}</p>
+        <p style="color:#444; margin-bottom:4px;"><span style="font-weight:600;">Price/Hour:</span> ₹{{ lot.Price_Per_Hour }}</p>
+        <p style="color:#444; margin-bottom:18px;"><span style="font-weight:600;">Max Spots:</span> {{ lot.Max_Spots }}</p>
+        {% if current_user and current_user.is_admin %}
+        <a href="{{ url_for('main.lot_preview', lot_id=lot.id) }}"
+           class="btn"
+           style="margin-top:auto; background:#10B981; color:#fff; padding:12px 0; width:100%; border-radius:5px; font-weight:bold; text-align:center; text-decoration:none; font-size:1.08em; box-shadow:0 1px 4px rgba(16, 185, 129, 0.07); border:none;">
+            Preview
+        </a>
+        {% else %}
+        <a href="{{ url_for('main.reserve', lot_id=lot.id) }}"
+           class="btn"
+           style="margin-top:auto; background:#2563eb; color:#fff; padding:12px 0; width:100%; border-radius:5px; font-weight:bold; text-align:center; text-decoration:none; font-size:1.08em; box-shadow:0 1px 4px rgba(37,99,235,0.07); border:none;">
+            Reserve
+        </a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div style="text-align:center; color:#888; font-size:1.1em; width:100%;">No parking lots available.</div>
+    {% endfor %}
+</div>
+{% endblock %}

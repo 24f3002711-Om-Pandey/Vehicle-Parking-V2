@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-center">Welcome, {{ user.Name }}</h2>
+    <div class="mb-6">
+        <p class="text-gray-700"><span class="font-semibold">Username:</span> {{ user.Username }}</p>
+        <p class="text-gray-700"><span class="font-semibold">Email:</span> {{ user.Email }}</p>
+    </div>
+    <h3 class="text-xl font-semibold mb-2">Booked Lots (Previous Orders)</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-md">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border-b">Lot Name</th>
+                    <th class="py-2 px-4 border-b">Spot #</th>
+                    <th class="py-2 px-4 border-b">Parking Time</th>
+                    <th class="py-2 px-4 border-b">Leaving Time</th>
+                    <th class="py-2 px-4 border-b">Total Cost</th>
+                    <th class="py-2 px-4 border-b">Status</th>
+                    <th class="py-2 px-4 border-b">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in reservations %}
+                <tr>
+                    <td class="py-2 px-4 border-b">{{ item.lot.Prime_location_name if item.lot else 'N/A' }}</td>
+                    <td class="py-2 px-4 border-b">{{ item.spot.Spot_number if item.spot else 'N/A' }}</td>
+                    <td class="py-2 px-4 border-b">{{ item.reservation.Parking_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="py-2 px-4 border-b">{{ item.reservation.Leaving_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="py-2 px-4 border-b">₹{{ item.reservation.Total_Cost|round(2) }}</td>
+                    <td class="py-2 px-4 border-b">
+                        {% if item.spot %}
+                            {{ item.spot.Status|capitalize }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td class="py-2 px-4 border-b">
+                        <form method="post" action="{{ url_for('main.cancel_reservation', reservation_id=item.reservation.id) }}" style="margin:0;">
+                            <button type="submit" class="btn" style="background:#ef4444; color:#fff; padding:7px 18px; border-radius:4px; font-size:0.97em; font-weight:bold; border:none;">
+                                Cancel
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-gray-500 py-4">No reservations found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

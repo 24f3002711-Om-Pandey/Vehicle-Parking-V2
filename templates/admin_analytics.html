@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Analytics Summary{% endblock %}
+{% block content %}
+<h1 class="center" style="font-size: 2em;">Analytics Summary</h1>
+<table>
+    <tr>
+        <th>Users</th>
+        <th>Parking Lots</th>
+        <th>Reservations</th>
+        <th>Lot Usage</th>
+    </tr>
+    <tr>
+        <td>
+            Total Users: <b>{{ total_users }}</b><br>
+            Banned Users: <b>{{ total_banned }}</b>
+        </td>
+        <td>
+            Total Lots: <b>{{ total_lots }}</b><br>
+            Total Spots: <b>{{ total_spots }}</b>
+        </td>
+        <td>
+            Total Reservations: <b>{{ total_reservations }}</b><br>
+            Total Revenue: <b>₹{{ total_revenue|round(2) }}</b>
+        </td>
+        <td>
+            <ul style="margin:0; padding-left:18px;">
+                {% for lot_name, count in lot_usage %}
+                <li>{{ lot_name }}: <b>{{ count }}</b> reservations</li>
+                {% else %}
+                <li>No data available.</li>
+                {% endfor %}
+            </ul>
+        </td>
+    </tr>
+</table>
+
+<!-- Chart Section -->
+<div style="max-width:600px;margin:32px auto 0 auto;">
+    <canvas id="lotUsageChart"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Prepare data from lot_usage
+    const lotLabels = [
+        {% for lot_name, count in lot_usage %}
+            "{{ lot_name }}",
+        {% endfor %}
+    ];
+    const lotCounts = [
+        {% for lot_name, count in lot_usage %}
+            {{ count }},
+        {% endfor %}
+    ];
+
+    const ctx = document.getElementById('lotUsageChart').getContext('2d');
+    const lotUsageChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: lotLabels,
+            datasets: [{
+                label: 'Reservations per Lot',
+                data: lotCounts,
+                backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                borderColor: 'rgba(37, 99, 235, 1)',
+                borderWidth: 1,
+                borderRadius: 6,
+                maxBarThickness: 48
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Reservations per Parking Lot',
+                    font: { size: 18 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+
+<div style="text-align:center; margin-top:28px;">
+    <a href="{{ url_for('main.admin_dashboard') }}"
+       class="btn"
+       style="
+            display:inline-block;
+            margin-right:14px;
+            background:linear-gradient(90deg,#2563eb 80%,#1d4ed8 100%);
+            color:#fff;
+            padding:14px 34px;
+            border-radius:6px;
+            font-weight:bold;
+            text-decoration:none;
+            font-size:1.08em;
+            box-shadow:0 2px 8px rgba(37,99,235,0.12);
+            letter-spacing:0.5px;
+            transition:background 0.18s, box-shadow 0.18s, transform 0.12s;
+            border:none;
+        "
+    >
+        <span style="font-size:1.2em;vertical-align:middle;margin-right:8px;">&#x1F4CA;</span>
+        View Dashboard
+    </a>
+    <a href="{{ url_for('main.lots') }}" class="btn" style="display:inline-block; background:#10b981; color:#fff; padding:14px 34px; border-radius:6px; font-weight:bold; text-decoration:none; font-size:1.08em; box-shadow:0 2px 8px rgba(16,185,129,0.10); transition:background 0.18s, box-shadow 0.18s, transform 0.12s; border:none;">
+        <span style="font-size:1.2em;vertical-align:middle;margin-right:8px;">&#x1F6A7;</span>
+        Manage Lots
+    </a>
+</div>
+{% endblock %}

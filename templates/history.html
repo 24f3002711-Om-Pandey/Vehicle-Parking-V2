@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Order History{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-center">Welcome, {{ user.Name }}</h2>
+    <h3 class="text-xl font-semibold mb-4 text-center">Your Order History</h3>
+    <div class="mb-4 text-right">
+        <a href="{{ url_for('main.profile') }}" class="btn" style="background:#2563eb; color:#fff; padding:7px 18px; border-radius:4px; font-size:0.97em; font-weight:bold; border:none; text-decoration:none; display:inline-block;">
+            Back to Profile
+        </a>
+    </div>
+    
+    <!-- Spending Graph -->
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold mb-3">Monthly Spending</h3>
+        <div class="graph-container" style="height: 300px;">
+            <canvas id="spendingChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Order History Table -->
+    <h3 class="text-xl font-semibold mb-2">Previous Orders</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-md">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border-b">Lot Name</th>
+                    <th class="py-2 px-4 border-b">Spot #</th>
+                    <th class="py-2 px-4 border-b">Parking Time</th>
+                    <th class="py-2 px-4 border-b">Leaving Time</th>
+                    <th class="py-2 px-4 border-b">Total Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in reservations %}
+                <tr>
+                    <td class="py-2 px-4 border-b">{{ item.lot.Prime_location_name if item.lot else 'N/A' }}</td>
+                    <td class="py-2 px-4 border-b">{{ item.spot.Spot_number if item.spot else 'N/A' }}</td>
+                    <td class="py-2 px-4 border-b">{{ item.reservation.Parking_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="py-2 px-4 border-b">{{ item.reservation.Leaving_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="py-2 px-4 border-b">₹{{ item.reservation.Total_Cost|round(2) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-gray-500 py-4">No reservations found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('spendingChart').getContext('2d');
+        
+        // Parse data from Flask
+        const monthlyData = {{ monthly_spending|tojson }};
+        
+        // Check if data exists
+        if (monthlyData && monthlyData.length > 0) {
+            // Extract months and spending amounts
+            const months = monthlyData.map(item => item.month);
+            const spending = monthlyData.map(item => item.amount);
+            
+            // Create the chart
+            const spendingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Monthly Spending (₹)',
+                    data: spending,
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Spent: ₹' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        } else {
+            // Display a message when no data is available
+            const noDataMessage = document.createElement('div');
+            noDataMessage.className = 'no-data-message';
+            noDataMessage.textContent = 'No spending data available yet. Make reservations to see your spending graph.';
+            noDataMessage.style.textAlign = 'center';
+            noDataMessage.style.padding = '20px';
+            noDataMessage.style.color = '#666';
+            noDataMessage.style.fontStyle = 'italic';
+            
+            // Replace canvas with message
+            const canvas = document.getElementById('spendingChart');
+            canvas.parentNode.replaceChild(noDataMessage, canvas);
+        }
+    }); // Close DOMContentLoaded event listener
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Parking Lots{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Parking Lots</h1>
+    <div style="text-align:right; margin-bottom:24px;">
+        <a href="{{ url_for('main.add_lot') }}"
+           class="btn"
+           style="
+                display:inline-block;
+                background:#2563eb;
+                color:#fff;
+                padding:12px 28px;
+                border-radius:6px;
+                font-weight:bold;
+                text-decoration:none;
+                font-size:1.08em;
+                box-shadow:0 2px 8px rgba(37,99,235,0.12);
+                letter-spacing:0.5px;
+                border:none;
+            ">
+            <span style="font-size:1.2em;vertical-align:middle;margin-right:8px;">&#x2795;</span>
+            Add Lot
+        </a>
+    </div>
+</div>
+<div class="overflow-x-auto">
+    <table class="min-w-full bg-white rounded-lg shadow-md">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Name</th>
+                <th class="py-2 px-4 border-b">Address</th>
+                <th class="py-2 px-4 border-b">Pin Code</th>
+                <th class="py-2 px-4 border-b">Price/Hour</th>
+                <th class="py-2 px-4 border-b">Max Spots</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lot in lots %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ lot.Prime_location_name }}</td>
+                <td class="py-2 px-4 border-b">{{ lot.Address }}</td>
+                <td class="py-2 px-4 border-b">{{ lot.Pin_Code }}</td>
+                <td class="py-2 px-4 border-b">₹{{ lot.Price_Per_Hour }}</td>
+                <td class="py-2 px-4 border-b">{{ lot.Max_Spots }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-gray-500 py-4">No parking lots found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
